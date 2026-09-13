@@ -699,15 +699,25 @@ HTML_ADMIN = """
                 container.innerHTML += html;
             });
 
+            // Initialisation du tri des catégories avec auto-scroll
             new Sortable(container, {
                 handle: '.drag-handle-cat',
-                animation: 150
+                animation: 150,
+                scroll: true,
+                scrollSensitivity: 100, // Distance (en px) du bord pour déclencher le défilement
+                scrollSpeed: 20,        // Vitesse du défilement
+                bubbleScroll: true
             });
 
+            // Initialisation du tri des plats dans chaque catégorie
             document.querySelectorAll('.items-container').forEach(el => {
                 new Sortable(el, {
                     handle: '.drag-handle-item',
-                    animation: 150
+                    animation: 150,
+                    scroll: true,
+                    scrollSensitivity: 80,
+                    scrollSpeed: 15,
+                    bubbleScroll: true
                 });
             });
         }
