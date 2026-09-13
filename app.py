@@ -604,18 +604,37 @@ HTML_ADMIN = """
         .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; border-bottom: 1px solid #f0f0f0; background: white;}
         .item-row:hover { background: #fdfdfd; }
         .controls-group { display: flex; align-items: center; gap: 6px; }
-/* Désactivation stricte des transitions CSS pendant le drag */
+/* --- ACCÉLÉRATION GPU & FLUIDITÉ DRAG & DROP --- */
+
+/* 1. Isolation GPU et suppression des animations parasites pendant le glissement */
 .sortable-drag, .sortable-ghost, .sortable-chosen {
     transition: none !important;
     animation: none !important;
-    will-change: transform;
+    will-change: transform; /* Force le passage sur le GPU (calque matériel) */
 }
-/* Poignées de glissement */
+
+/* 2. Style visuel de l'élément laissé en arrière-plan */
+.sortable-ghost {
+    opacity: 0.35;
+    background-color: #f3f4f6;
+}
+
+/* 3. Style visuel de l'élément en cours de déplacement */
+.sortable-drag {
+    opacity: 0.95;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+}
+
+/* 4. Libération des événements tactiles et curseur sur les poignées */
 .drag-handle-cat, .drag-handle-item {
-    touch-action: none;
-    cursor: grab;
-    -webkit-user-select: none;
+    touch-action: none;          /* Empêche les conflits de gestes natifs iOS/Android */
+    cursor: grab;                 /* Curseur main fermée sur Mac/PC */
+    -webkit-user-select: none;    /* Empêche la sélection de texte intempestive */
     user-select: none;
+}
+
+.drag-handle-cat:active, .drag-handle-item:active {
+    cursor: grabbing;
 }
     </style>
 </head>
@@ -712,19 +731,21 @@ HTML_ADMIN = """
                 container.innerHTML += html;
             });
 
-            // Détection automatique des écrans tactiles
-const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+        // Détection automatique : iPhone/Mobile vs Mac/PC
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
-const commonSortableOptions = {
-    animation: 0,
-    forceFallback: isTouchDevice, // Nativement instantané sur PC (0 ms), fallback activé sur mobile
-    fallbackTolerance: isTouchDevice ? 3 : 0,
-    delay: 0,
-    scroll: true,
-    scrollSensitivity: 200,
-    scrollSpeed: 50,
-    bubbleScroll: true
-};
+    const commonSortableOptions = {
+        animation: 150,
+        // Conserve forceFallback pour l'iPhone, utilise le moteur natif rapide sur Mac
+        forceFallback: isTouch,
+        fallbackTolerance: isTouch ? 5 : 0,
+        delay: 0,
+        scroll: true,
+        // Paramètres ajustés spécifiquement selon l'appareil
+        scrollSensitivity: isTouch ? 180 : 250,
+        scrollSpeed: isTouch ? 30 : 80, // Vitesse fortement augmentée pour le trackpad Mac
+        bubbleScroll: true
+    };
 
             new Sortable(container, {
     handle: '.drag-handle-cat',
