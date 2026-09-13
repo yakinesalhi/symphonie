@@ -637,16 +637,24 @@ HTML_ADMIN = """
             animation: none !important;
             will-change: transform;
         }
+        
+        /* Carte en cours de déplacement sous le curseur */
+.sortable-drag {
+    opacity: 0.95 !important;
+    z-index: 99999 !important;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25) !important;
+    pointer-events: none !important; /* CRUCIAL : permet d'insérer l'élément au-dessus/en-dessous des autres */
+    width: 100% !important; /* Empêche la carte de se rétrécir */
+    max-width: 800px; /* Adaptez selon la largeur maximale de votre conteneur admin */
+    box-sizing: border-box !important;
+}
 
-        .sortable-ghost {
-            opacity: 0.35;
-            background-color: #f3f4f6;
-        }
-
-        .sortable-drag {
-            opacity: 0.95;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
-        }
+/* Emplacement vide laissé pendant le déplacement */
+.sortable-ghost {
+    opacity: 0.2 !important;
+    background-color: #e2e8f0 !important;
+    border: 2px dashed #94a3b8 !important;
+}
 
         .drag-handle-cat, .drag-handle-item {
             touch-action: none;
@@ -756,15 +764,15 @@ HTML_ADMIN = """
             // Détection automatique : iPhone/Mobile vs Mac/PC
             const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
-            const commonSortableOptions = {
+           const commonSortableOptions = {
     animation: 150,
-    forceFallback: true, // FORCÉ À TRUE (désactive le drag HTML5 natif du navigateur)
-    fallbackTolerance: 5,
-    delay: 0,
+    forceFallback: true,
+    fallbackOnBody: true, // Libère la carte des limites du conteneur parent
+    fallbackClass: 'sortable-drag',
+    ghostClass: 'sortable-ghost',
     scroll: true,
-    scrollSensitivity: isTouch ? 180 : 250,
-    scrollSpeed: isTouch ? 30 : 80,
-    bubbleScroll: true
+    scrollSensitivity: 100,
+    scrollSpeed: 30
 };
 
             async function saveOrder(type, containerEl) {
