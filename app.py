@@ -638,23 +638,23 @@ HTML_ADMIN = """
             will-change: transform;
         }
         
-        /* Carte en cours de déplacement sous le curseur */
-.sortable-drag {
-    opacity: 0.95 !important;
-    z-index: 99999 !important;
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25) !important;
-    pointer-events: none !important; /* CRUCIAL : permet d'insérer l'élément au-dessus/en-dessous des autres */
-    width: 100% !important; /* Empêche la carte de se rétrécir */
-    max-width: 800px; /* Adaptez selon la largeur maximale de votre conteneur admin */
-    box-sizing: border-box !important;
-}
+      /* Style de la carte attrapée (évite le rétrécissement) */
+        .sortable-drag {
+            opacity: 0.95 !important;
+            z-index: 99999 !important;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3) !important;
+            pointer-events: none !important;
+            width: 100% !important;
+            max-width: 926px !important; /* Ajusté à la largeur exacte du conteneur admin */
+            box-sizing: border-box !important;
+        }
 
-/* Emplacement vide laissé pendant le déplacement */
-.sortable-ghost {
-    opacity: 0.2 !important;
-    background-color: #e2e8f0 !important;
-    border: 2px dashed #94a3b8 !important;
-}
+        /* Emplacement réservé pendant le mouvement */
+        .sortable-ghost {
+            opacity: 0.25 !important;
+            background-color: #e2e8f0 !important;
+            border: 2px dashed #94a3b8 !important;
+        }
 
         .drag-handle-cat, .drag-handle-item {
             touch-action: none;
@@ -761,19 +761,22 @@ HTML_ADMIN = """
                 container.innerHTML += html;
             });
 
-            // Détection automatique : iPhone/Mobile vs Mac/PC
+           // Détection écran tactile
             const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
-           const commonSortableOptions = {
-    animation: 150,
-    forceFallback: true,
-    fallbackOnBody: true, // Libère la carte des limites du conteneur parent
-    fallbackClass: 'sortable-drag',
-    ghostClass: 'sortable-ghost',
-    scroll: true,
-    scrollSensitivity: 100,
-    scrollSpeed: 30
-};
+            const commonSortableOptions = {
+                animation: 150,
+                forceFallback: true,        // Active le fallback JS universel
+                fallbackOnBody: true,       // Décolle l'élément pour ne pas le déformer
+                fallbackClass: 'sortable-drag',
+                ghostClass: 'sortable-ghost',
+                chosenClass: 'sortable-chosen',
+                scroll: true,
+                scrollSensitivity: 100,
+                scrollSpeed: 30,
+                filter: 'input, button, select', // Bloque le drag sur les champs de texte
+                preventOnFilter: false
+            };
 
             async function saveOrder(type, containerEl) {
                 const ids = Array.from(containerEl.children)
@@ -787,13 +790,11 @@ HTML_ADMIN = """
                 });
             }
 
-            // Initialisation Sortable pour les CATÉGORIES (strictement ciblé sur .cat-card)
+            // 1. Initialisation CATÉGORIES
             new Sortable(container, {
-                animation: 150,
+                ...commonSortableOptions,
                 handle: '.drag-handle-cat',
                 draggable: '.cat-card',
-                ghostClass: 'sortable-ghost',
-                chosenClass: 'sortable-chosen',
                 delay: isTouch ? 100 : 0,
                 delayOnTouchOnly: true,
                 touchStartThreshold: 5,
@@ -802,14 +803,12 @@ HTML_ADMIN = """
                 }
             });
 
-            // Initialisation Sortable pour les PLATS (strictement ciblé sur .item-row)
+            // 2. Initialisation PLATS
             document.querySelectorAll('.items-container').forEach(el => {
                 new Sortable(el, {
-                    animation: 150,
+                    ...commonSortableOptions,
                     handle: '.drag-handle-item',
                     draggable: '.item-row',
-                    ghostClass: 'sortable-ghost',
-                    chosenClass: 'sortable-chosen',
                     delay: isTouch ? 100 : 0,
                     delayOnTouchOnly: true,
                     touchStartThreshold: 5,
