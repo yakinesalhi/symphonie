@@ -604,8 +604,21 @@ HTML_ADMIN = """
         .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; border-bottom: 1px solid #f0f0f0; background: white;}
         .item-row:hover { background: #fdfdfd; }
         .controls-group { display: flex; align-items: center; gap: 6px; }
-        .drag-handle-cat, .drag-handle-item {
+        /* Classe fantôme (élément laissé à la position d'origine) */
+.sortable-ghost {
+    opacity: 0.3;
+    background-color: #f3f4f6;
+}
+
+/* Élément en cours de déplacement */
+.sortable-drag {
+    opacity: 0.95;
+}
+
+/* Poignées de glissement */
+.drag-handle-cat, .drag-handle-item {
     touch-action: none;
+    cursor: grab;
     -webkit-user-select: none;
     user-select: none;
 }
@@ -703,6 +716,18 @@ HTML_ADMIN = """
                 html += `</div></div>`;
                 container.innerHTML += html;
             });
+
+            const commonSortableOptions = {
+    animation: 150,
+    forceFallback: true,
+    fallbackTolerance: 5,     // Nécessite un déplacement de 5px avant de démarrer (évite les glitches)
+    delay: 100,               // Délai léger sur mobile pour faire la différence avec le scroll normal
+    delayOnTouchOnly: true,    // Le délai ne s'applique que sur écran tactile
+    scroll: true,
+    scrollSensitivity: 80,    // Sensibilité ajustée pour un défilement doux
+    scrollSpeed: 12,          // Vitesse fluide sans saut d'écran
+    bubbleScroll: true
+};
 
             new Sortable(container, {
     handle: '.drag-handle-cat',
