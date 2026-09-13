@@ -718,14 +718,13 @@ HTML_ADMIN = """
             });
 
             const commonSortableOptions = {
-        animation: 150,
+        animation: 0,             // Permutations instantanées (supprime les transitions lentes)
         forceFallback: true,
-        fallbackTolerance: 3,     // Déclenché après 3px seulement pour plus de réactivité
-        delay: 50,                // Réduit à 50ms pour un démarrage plus rapide
-        delayOnTouchOnly: true,
+        fallbackTolerance: 0,     // Prise en main instantanée dès 1px de mouvement
+        delay: 0,                 // Zéro délai d'attente au clic ou au touché
         scroll: true,
-        scrollSensitivity: 180,   // Zone de détection très large (180px du bord haut/bas)
-        scrollSpeed: 28,          // Vitesse de défilement accélérée
+        scrollSensitivity: 250,   // Déclenchement du défilement très loin du bord
+        scrollSpeed: 60,          // Vitesse de défilement ultra-rapide
         bubbleScroll: true
     };
 
