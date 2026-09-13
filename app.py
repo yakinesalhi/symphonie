@@ -757,15 +757,15 @@ HTML_ADMIN = """
             const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
             const commonSortableOptions = {
-                animation: 150,
-                forceFallback: isTouch,
-                fallbackTolerance: isTouch ? 5 : 0,
-                delay: 0,
-                scroll: true,
-                scrollSensitivity: isTouch ? 180 : 250,
-                scrollSpeed: isTouch ? 30 : 80,
-                bubbleScroll: true
-            };
+    animation: 150,
+    forceFallback: true, // FORCÉ À TRUE (désactive le drag HTML5 natif du navigateur)
+    fallbackTolerance: 5,
+    delay: 0,
+    scroll: true,
+    scrollSensitivity: isTouch ? 180 : 250,
+    scrollSpeed: isTouch ? 30 : 80,
+    bubbleScroll: true
+};
 
             async function saveOrder(type, containerEl) {
                 const ids = Array.from(containerEl.children)
