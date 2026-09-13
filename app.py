@@ -779,18 +779,32 @@ HTML_ADMIN = """
                 });
             }
 
+            // Initialisation Sortable pour les CATÉGORIES (strictement ciblé sur .cat-card)
             new Sortable(container, {
-                ...commonSortableOptions,
+                animation: 150,
                 handle: '.drag-handle-cat',
+                draggable: '.cat-card',
+                ghostClass: 'sortable-ghost',
+                chosenClass: 'sortable-chosen',
+                delay: isTouch ? 100 : 0,
+                delayOnTouchOnly: true,
+                touchStartThreshold: 5,
                 onEnd: function() {
                     saveOrder('category', container);
                 }
             });
 
+            // Initialisation Sortable pour les PLATS (strictement ciblé sur .item-row)
             document.querySelectorAll('.items-container').forEach(el => {
                 new Sortable(el, {
-                    ...commonSortableOptions,
+                    animation: 150,
                     handle: '.drag-handle-item',
+                    draggable: '.item-row',
+                    ghostClass: 'sortable-ghost',
+                    chosenClass: 'sortable-chosen',
+                    delay: isTouch ? 100 : 0,
+                    delayOnTouchOnly: true,
+                    touchStartThreshold: 5,
                     onEnd: function() {
                         saveOrder('item', el);
                     }
