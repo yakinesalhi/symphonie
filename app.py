@@ -93,9 +93,8 @@ def init_db():
             if row and row['cnt'] == 0:
                 cats = [
                     "Les Plats Gastro Volailles", "Viande Rouge", "Entrées Chaudes", 
-                    "Les Plats Traditionnels", "Nos Brochettes", "Pasta", 
-                    "Fast Food", "Nos Poissons", "Boissons Fraîches", 
-                    "Boissons Chaudes", "Desserts"
+                    "Les Plats Traditionnels", "Fast Food", 
+                    "Boissons Fraîches", "Boissons Chaudes"
                 ]
                 for idx, c in enumerate(cats):
                     cur.execute("INSERT INTO categories (name, position) VALUES (%s, %s);", (c, idx))
@@ -121,38 +120,17 @@ def init_db():
                     (4, 'Tajine Zitoune'), (4, 'Jelbana'), (4, 'Mtouwem'), (4, 'Kebab Traditionnel'), (4, 'Ojja / Aaja'), (4, 'Les Abats'), 
                     (4, 'Poulet Mfouwer (Vapeur)'), (4, 'Viande Mfouwer (Vapeur)'), (4, 'Bouzelouf'), (4, 'Méchoui (au poids)'), (4, 'Cuisse rôtie'),
                     
-                    # 5. Nos Brochettes
-                    (5, 'Steak haché'), (5, 'Tranche de foie'), (5, 'Brochette de foie de dinde royale'), (5, 'Brochette merguez'), 
-                    (5, 'Brochette de viande royale'), (5, 'Brochette de foie de veau'), (5, 'Brochette Melfouf'), (5, 'Brochette Kebab'), 
-                    (5, "Brochette d'entrecôte de bœuf"), (5, "Côte d'agneau"), (5, 'Mélange Foie, Dinde & Viande'),
+                    # 5. Fast Food
+                    (5, 'Tacos Poulet'), (5, 'Tacos Viande Hachée'), (5, 'Tacos Crispy'), (5, 'Tacos Mixte'), (5, 'Burger Poulet'), 
+                    (5, 'Burger Viande'), (5, 'Burger Mixte'), (5, 'Burger Crispy'), (5, 'Menu Enfant au Choix'),
                     
-                    # 6. Pasta
-                    (6, 'Spaghetti Bolognaise'), (6, 'Spaghetti Napolitaine'), (6, 'Spaghetti aux Fruits de Mer'), (6, 'Spaghetti Quatre Fromages'), 
-                    (6, 'Tagliatelles Poulet & Champignons'), (6, 'Tagliatelles Quatre Fromages'), (6, 'Tagliatelles au Saumon'), 
-                    (6, 'Tagliatelles au Camembert'), (6, 'Linguine aux Crevettes'),
+                    # 6. Boissons Fraîches
+                    (6, 'Eau Minérale (Grand Modèle)'), (6, 'Eau Minérale (Petit Modèle)'), (6, 'Coca-Cola 1L'), (6, 'Hamoud Boualem 1L'), (6, 'Hamoud Canette'), (6, 'Coca-Cola Canette'), 
+                    (6, 'Eau de Source'), (6, "Jus d'Orange Naturel"), (6, 'Citronnade Naturelle'), (6, 'Mojito Maison (Sans alcool)'), (6, 'Cocktail de Fruits Frais'), 
+                    (6, 'Jus Signature Symphonie'), (6, 'Milkshake Gourmand'), (6, 'Café Glacé'), (6, 'Jus de Banane Frais'), (6, 'Jus de Fraise Frais'),
                     
-                    # 7. Fast Food
-                    (7, 'Tacos Poulet'), (7, 'Tacos Viande Hachée'), (7, 'Tacos Crispy'), (7, 'Tacos Mixte'), (7, 'Burger Poulet'), 
-                    (7, 'Burger Viande'), (7, 'Burger Mixte'), (7, 'Burger Crispy'), (7, 'Menu Enfant au Choix'),
-                    
-                    # 8. Nos Poissons
-                    (8, 'Dorade Grillée'), (8, 'Pavé de Saumon'), (8, 'Calamars Grillés / Frits'), (8, 'Loup de Mer'), (8, 'Seiche en Sauce'), (8, 'Steak d\'Espadon'), 
-                    (8, 'Crevettes Grillées'), (8, 'Crevettes Sautées en Sauce'), (8, 'Sardines Grillées'), (8, 'Rouget Frit / Grillé'), (8, 'Pageot'), (8, 'Marbré'), 
-                    (8, 'Brochet'), (8, 'Pagre'), (8, 'Plateau Mix Poissons'),
-                    
-                    # 9. Boissons Fraîches
-                    (9, 'Eau Minérale (Grand Modèle)'), (9, 'Eau Minérale (Petit Modèle)'), (9, 'Coca-Cola 1L'), (9, 'Hamoud Boualem 1L'), (9, 'Hamoud Canette'), (9, 'Coca-Cola Canette'), 
-                    (9, 'Eau de Source'), (9, "Jus d'Orange Naturel"), (9, 'Citronnade Naturelle'), (9, 'Mojito Maison (Sans alcool)'), (9, 'Cocktail de Fruits Frais'), 
-                    (9, 'Jus Signature Symphonie'), (9, 'Milkshake Gourmand'), (9, 'Café Glacé'), (9, 'Jus de Banane Frais'), (9, 'Jus de Fraise Frais'),
-                    
-                    # 10. Boissons Chaudes
-                    (10, 'Café Nespresso'), (10, 'Thé Traditionnel de Timimoun'), (10, 'Thé Lipton au Choix'), (10, 'Tisane Infusion Maison'),
-                    
-                    # 11. Desserts
-                    (11, 'Crêpe Simple (Sucre/Beurre)'), (11, 'Crêpe aux Fruits'), (11, 'Crêpe Surprise Symphonie'), (11, 'Crêpe Banane Chocolat'), (11, 'Crêpe Spéciale Maison'), 
-                    (11, 'Gaufre Simple'), (11, 'Gaufre aux Fruits'), (11, 'Gaufre Surprise'), (11, 'Gaufre Banane Chocolat'), (11, 'Fondant au Chocolat Coeur Coulant'), 
-                    (11, 'Mousse au Chocolat Noir'), (11, 'Crème Brûlée à la Vanille'), (11, 'Crème Caramel Onctueuse'), (11, 'Tiramisu Italien Traditionnel'), (11, 'Salade de Fruits Frais'), 
-                    (11, 'Assiette de Fruits de Saison')
+                    # 7. Boissons Chaudes
+                    (7, 'Café Nespresso'), (7, 'Thé Traditionnel de Timimoun'), (7, 'Thé Lipton au Choix'), (7, 'Tisane Infusion Maison')
                 ]
                 
                 for idx, (cat_id, name) in enumerate(items_data):
@@ -193,15 +171,8 @@ def requires_auth(f):
 # --- API ROUTES ---
 @app.route('/ping')
 def ping():
-    try:
-        conn = get_db()  
-        cur = conn.cursor()
-        cur.execute('SELECT 1;')
-        cur.close()
-        conn.close()
-        return "OK", 200
-    except Exception as e:
-        return f"Database error: {str(e)}", 500
+    # Réponse HTTP directe sans exécuter de requête SQL
+    return "OK", 200
 
 @app.route('/api/menu')
 def get_menu():
@@ -502,14 +473,18 @@ HTML_CLIENT = """
             font-weight: 500; 
             letter-spacing: 0.3px;
         }
-        .item-price { 
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 1.2rem; 
-        color: var(--gold-primary); 
-        font-weight: 700; 
-        white-space: nowrap;
-        margin-left: 15px;
-        font-variant-numeric: tabular-nums; /* Aligne parfaitement la largeur des chiffres */
+        .menu-item-price {
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #c5a059;
+            white-space: nowrap;
+        }
+        .menu-item-price .currency {
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-left: 2px;
+            text-transform: uppercase;
         }
         .out-of-stock { opacity: 0.45; filter: grayscale(80%); }
         .badge-rupture { 
@@ -599,7 +574,7 @@ HTML_CLIENT = """
                                 <div class="item-name">${item.name}</div>
                                 ${!item.available ? '<span class="badge-rupture"><i class="fas fa-times-circle"></i> Indisponible</span>' : ''}
                             </div>
-                            <div class="item-price">${item.price > 0 ? item.price + ' <small style="font-size: 0.8rem;">DA</small>' : '—'}</div>
+                            <div class="menu-item-price">${item.price > 0 ? item.price + ' <span class="currency">DA</span>' : '—'}</div>
                         </div>`;
                 });
                 container.innerHTML += html;
@@ -781,12 +756,10 @@ HTML_ADMIN = """
             }
         }
 
-        // --- OPTIMISTIC UI TOGGLE ---
         async function toggle(id, btnElement) {
             const isCurrentlyAvailable = btnElement.classList.contains('btn-success') || btnElement.textContent.includes('En Stock');
             const newStatus = !isCurrentlyAvailable;
 
-            // 1. Changement visuel instantané (0 ms)
             if (newStatus) {
                 btnElement.textContent = "En Stock";
                 btnElement.className = "btn btn-sm btn-success";
@@ -796,12 +769,10 @@ HTML_ADMIN = """
             }
             btnElement.style.width = "85px";
 
-            // 2. Traitement réseau en arrière-plan
             try {
                 const res = await fetch(`/api/toggle/${id}`, {method: 'POST'});
                 if (!res.ok) throw new Error();
             } catch (err) {
-                // Annulation en cas d'erreur de connexion
                 if (isCurrentlyAvailable) {
                     btnElement.textContent = "En Stock";
                     btnElement.className = "btn btn-sm btn-success";
