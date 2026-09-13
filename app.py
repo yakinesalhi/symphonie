@@ -174,6 +174,32 @@ def ping():
     # Réponse HTTP directe sans exécuter de requête SQL
     return "OK", 200
 
+@app.route('/admin/reorder', methods=['POST'])
+@requires_auth
+def reorder():
+    data = request.get_json() or {}
+    item_type = data.get('type')
+    new_order = data.get('order', [])
+
+    conn = get_db()
+    cur = conn.cursor()
+    try:
+        if item_type == 'category':
+            for index, cat_id in enumerate(new_order):
+                cur.execute("UPDATE categories SET position = %s WHERE id = %s;", (index, int(cat_id)))
+        elif item_type == 'item':
+            for index, item_id in enumerate(new_order):
+                cur.execute("UPDATE menu_items SET position = %s WHERE id = %s;", (index, int(item_id)))
+        conn.commit()
+        invalidate_menu_cache()
+    except Exception as e:
+        print(f"Erreur reorder: {e}")
+        conn.rollback()
+    finally:
+        cur.close()
+
+    return jsonify({"status": "success"}), 200
+
 @app.route('/api/menu')
 def get_menu():
     global MENU_CACHE
@@ -604,38 +630,34 @@ HTML_ADMIN = """
         .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; border-bottom: 1px solid #f0f0f0; background: white;}
         .item-row:hover { background: #fdfdfd; }
         .controls-group { display: flex; align-items: center; gap: 6px; }
-/* --- ACCÉLÉRATION GPU & FLUIDITÉ DRAG & DROP --- */
 
-/* 1. Isolation GPU et suppression des animations parasites pendant le glissement */
-.sortable-drag, .sortable-ghost, .sortable-chosen {
-    transition: none !important;
-    animation: none !important;
-    will-change: transform; /* Force le passage sur le GPU (calque matériel) */
-}
+        /* ACCÉLÉRATION GPU & FLUIDITÉ DRAG & DROP */
+        .sortable-drag, .sortable-ghost, .sortable-chosen {
+            transition: none !important;
+            animation: none !important;
+            will-change: transform;
+        }
 
-/* 2. Style visuel de l'élément laissé en arrière-plan */
-.sortable-ghost {
-    opacity: 0.35;
-    background-color: #f3f4f6;
-}
+        .sortable-ghost {
+            opacity: 0.35;
+            background-color: #f3f4f6;
+        }
 
-/* 3. Style visuel de l'élément en cours de déplacement */
-.sortable-drag {
-    opacity: 0.95;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
-}
+        .sortable-drag {
+            opacity: 0.95;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+        }
 
-/* 4. Libération des événements tactiles et curseur sur les poignées */
-.drag-handle-cat, .drag-handle-item {
-    touch-action: none;          /* Empêche les conflits de gestes natifs iOS/Android */
-    cursor: grab;                 /* Curseur main fermée sur Mac/PC */
-    -webkit-user-select: none;    /* Empêche la sélection de texte intempestive */
-    user-select: none;
-}
+        .drag-handle-cat, .drag-handle-item {
+            touch-action: none;
+            cursor: grab;
+            -webkit-user-select: none;
+            user-select: none;
+        }
 
-.drag-handle-cat:active, .drag-handle-item:active {
-    cursor: grabbing;
-}
+        .drag-handle-cat:active, .drag-handle-item:active {
+            cursor: grabbing;
+        }
     </style>
 </head>
 <body>
@@ -731,43 +753,49 @@ HTML_ADMIN = """
                 container.innerHTML += html;
             });
 
-        // Détection automatique : iPhone/Mobile vs Mac/PC
-    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+            // Détection automatique : iPhone/Mobile vs Mac/PC
+            const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
-    const commonSortableOptions = {
-        animation: 150,
-        // Conserve forceFallback pour l'iPhone, utilise le moteur natif rapide sur Mac
-        forceFallback: isTouch,
-        fallbackTolerance: isTouch ? 5 : 0,
-        delay: 0,
-        scroll: true,
-        // Paramètres ajustés spécifiquement selon l'appareil
-        scrollSensitivity: isTouch ? 180 : 250,
-        scrollSpeed: isTouch ? 30 : 80, // Vitesse fortement augmentée pour le trackpad Mac
-        bubbleScroll: true
-    };
+            const commonSortableOptions = {
+                animation: 150,
+                forceFallback: isTouch,
+                fallbackTolerance: isTouch ? 5 : 0,
+                delay: 0,
+                scroll: true,
+                scrollSensitivity: isTouch ? 180 : 250,
+                scrollSpeed: isTouch ? 30 : 80,
+                bubbleScroll: true
+            };
+
+            async function saveOrder(type, containerEl) {
+                const ids = Array.from(containerEl.children)
+                    .map(el => el.dataset.id)
+                    .filter(id => id !== undefined && id !== null);
+                if (ids.length === 0) return;
+                await fetch('/admin/reorder', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: type, order: ids })
+                });
+            }
 
             new Sortable(container, {
-    handle: '.drag-handle-cat',
-    animation: 150,
-    forceFallback: true,
-    scroll: true,
-    scrollSensitivity: 120,
-    scrollSpeed: 20,
-    bubbleScroll: true
-});
+                ...commonSortableOptions,
+                handle: '.drag-handle-cat',
+                onEnd: function() {
+                    saveOrder('category', container);
+                }
+            });
 
-document.querySelectorAll('.items-container').forEach(el => {
-    new Sortable(el, {
-        handle: '.drag-handle-item',
-        animation: 150,
-        forceFallback: true,
-        scroll: true,
-        scrollSensitivity: 100,
-        scrollSpeed: 15,
-        bubbleScroll: true
-    });
-});
+            document.querySelectorAll('.items-container').forEach(el => {
+                new Sortable(el, {
+                    ...commonSortableOptions,
+                    handle: '.drag-handle-item',
+                    onEnd: function() {
+                        saveOrder('item', el);
+                    }
+                });
+            });
         }
 
         async function addCategory() {
