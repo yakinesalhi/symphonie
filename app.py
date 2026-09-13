@@ -718,16 +718,16 @@ HTML_ADMIN = """
             });
 
             const commonSortableOptions = {
-    animation: 150,
-    forceFallback: true,
-    fallbackTolerance: 5,     // Nécessite un déplacement de 5px avant de démarrer (évite les glitches)
-    delay: 100,               // Délai léger sur mobile pour faire la différence avec le scroll normal
-    delayOnTouchOnly: true,    // Le délai ne s'applique que sur écran tactile
-    scroll: true,
-    scrollSensitivity: 80,    // Sensibilité ajustée pour un défilement doux
-    scrollSpeed: 12,          // Vitesse fluide sans saut d'écran
-    bubbleScroll: true
-};
+        animation: 150,
+        forceFallback: true,
+        fallbackTolerance: 3,     // Déclenché après 3px seulement pour plus de réactivité
+        delay: 50,                // Réduit à 50ms pour un démarrage plus rapide
+        delayOnTouchOnly: true,
+        scroll: true,
+        scrollSensitivity: 180,   // Zone de détection très large (180px du bord haut/bas)
+        scrollSpeed: 28,          // Vitesse de défilement accélérée
+        bubbleScroll: true
+    };
 
             new Sortable(container, {
     handle: '.drag-handle-cat',
