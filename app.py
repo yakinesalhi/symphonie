@@ -604,6 +604,11 @@ HTML_ADMIN = """
         .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; border-bottom: 1px solid #f0f0f0; background: white;}
         .item-row:hover { background: #fdfdfd; }
         .controls-group { display: flex; align-items: center; gap: 6px; }
+        .drag-handle-cat, .drag-handle-item {
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
     </style>
 </head>
 <body>
@@ -699,27 +704,27 @@ HTML_ADMIN = """
                 container.innerHTML += html;
             });
 
-            // Initialisation du tri des catégories avec auto-scroll
             new Sortable(container, {
-                handle: '.drag-handle-cat',
-                animation: 150,
-                scroll: true,
-                scrollSensitivity: 100, // Distance (en px) du bord pour déclencher le défilement
-                scrollSpeed: 20,        // Vitesse du défilement
-                bubbleScroll: true
-            });
+    handle: '.drag-handle-cat',
+    animation: 150,
+    forceFallback: true,
+    scroll: true,
+    scrollSensitivity: 120,
+    scrollSpeed: 20,
+    bubbleScroll: true
+});
 
-            // Initialisation du tri des plats dans chaque catégorie
-            document.querySelectorAll('.items-container').forEach(el => {
-                new Sortable(el, {
-                    handle: '.drag-handle-item',
-                    animation: 150,
-                    scroll: true,
-                    scrollSensitivity: 80,
-                    scrollSpeed: 15,
-                    bubbleScroll: true
-                });
-            });
+document.querySelectorAll('.items-container').forEach(el => {
+    new Sortable(el, {
+        handle: '.drag-handle-item',
+        animation: 150,
+        forceFallback: true,
+        scroll: true,
+        scrollSensitivity: 100,
+        scrollSpeed: 15,
+        bubbleScroll: true
+    });
+});
         }
 
         async function addCategory() {
