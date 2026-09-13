@@ -604,17 +604,12 @@ HTML_ADMIN = """
         .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; border-bottom: 1px solid #f0f0f0; background: white;}
         .item-row:hover { background: #fdfdfd; }
         .controls-group { display: flex; align-items: center; gap: 6px; }
-        /* Classe fantôme (élément laissé à la position d'origine) */
-.sortable-ghost {
-    opacity: 0.3;
-    background-color: #f3f4f6;
+/* Désactivation stricte des transitions CSS pendant le drag */
+.sortable-drag, .sortable-ghost, .sortable-chosen {
+    transition: none !important;
+    animation: none !important;
+    will-change: transform;
 }
-
-/* Élément en cours de déplacement */
-.sortable-drag {
-    opacity: 0.95;
-}
-
 /* Poignées de glissement */
 .drag-handle-cat, .drag-handle-item {
     touch-action: none;
@@ -717,16 +712,19 @@ HTML_ADMIN = """
                 container.innerHTML += html;
             });
 
-            const commonSortableOptions = {
-        animation: 0,             // Permutations instantanées (supprime les transitions lentes)
-        forceFallback: true,
-        fallbackTolerance: 0,     // Prise en main instantanée dès 1px de mouvement
-        delay: 0,                 // Zéro délai d'attente au clic ou au touché
-        scroll: true,
-        scrollSensitivity: 250,   // Déclenchement du défilement très loin du bord
-        scrollSpeed: 60,          // Vitesse de défilement ultra-rapide
-        bubbleScroll: true
-    };
+            // Détection automatique des écrans tactiles
+const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
+const commonSortableOptions = {
+    animation: 0,
+    forceFallback: isTouchDevice, // Nativement instantané sur PC (0 ms), fallback activé sur mobile
+    fallbackTolerance: isTouchDevice ? 3 : 0,
+    delay: 0,
+    scroll: true,
+    scrollSensitivity: 200,
+    scrollSpeed: 50,
+    bubbleScroll: true
+};
 
             new Sortable(container, {
     handle: '.drag-handle-cat',
